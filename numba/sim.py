@@ -3,43 +3,67 @@
 # Simulation described in Levin, et al. "Population genetics of antibiotic resistance",
 # CID 1997.
 
-from numba import jit
 import numpy as np
+import sys
 
-@jit
-def sim(s, T, f, g, tg, N, n_generations):
-    p_treatment = T * tg # p_treatment * 1 year / (tx per year) = T
+class Levin:
+    def __init__(self, s, T, f, g, tg, N, n_generations, H0=1e-9, E0=1e-9, log=None, log_interval=100):
+        self.s = s
+        self.T = T
+        self.f = f
+        self.g = g
+        self.tg = tg
+        self.N = N
+        self.n_generations = n_generations
+        self.E = E0
+        self.H = np.full(N, H0)
+        self.log = log
+        self.log_interval = log_interval
 
-    E = 1e-9 # initial fraction resistant in environment
-    H = np.array([1e-9 for i in range(N)]) # initial fraction resistant in each host
+        self.p_treatment = T * tg
 
-    for generation_i in range(n_generations):
-        # compute new environment
-        # environment gets host bugs and experiences in-environment selection
-        E_new = E + f * (np.mean(H) - E) - s * E * (1 - E) / (1.0 - s * E)
+    def run(self):
+        if self.log is not None:
+            # print the header
+            print('generation', 'host', 'env', sep='\t', file=self.log)
 
-        # compute & update hosts
-        for host_i in range(N):
-            # does this host get treatment?
-            if np.random.binomial(1, p_treatment):
-                # treated hosts get 100% resistance
-                H[host_i] = 1.0
-            else:
-                # untreated hosts get environmental bugs and experience in-host selection
-                H[host_i] = H[host_i] + g * (E - H[host_i]) - s * H[host_i] * (1.0 - H[host_i]) / (1.0 - s * H[host_i])
+            n_complete = 0
+            while n_complete < self.n_generations:
+                this_interval = min(self.log_interval, self.n_generations - n_complete)
+                self.advance_n(this_interval)
+                n_complete += this_interval
+                print(n_complete, np.mean(self.H), self.E, sep='\t', file=self.log)
+        else:
+            self.advance_n(self.n_generations)
 
-        # update environment
-        E = E_new
+        return (np.mean(self.H), self.E)
 
-    # make report
-    return np.mean(H)
+    def advance_n(self, n_generations):
+        for i in range(n_generations):
+            self.advance()
 
-s = 0.01 # selection coefficient favoring susceptible strains
+    def advance(self):
+        # act as if no hosts got drug
+        self.H = self.H + self.g * (self.E - self.H) - self.s * self.H * (1.0 - self.H) / (1.0 - self.s * self.H)
+
+        # then replace some with treatment
+        treatment = np.random.binomial(1, self.p_treatment, size=self.N).astype(float)
+        self.H = np.fmax(self.H, treatment)
+
+        self.E = self.E + self.f * (np.mean(self.H) - self.E) - self.s * self.E * (1 - self.E) / (1.0 - self.s * self.E)
+
+
+s = 0.005 # selection coefficient favoring susceptible strains
 T = 2.0 # average treatments per year
 f = 0.05 # fraction of environment replaced by host-shed bugs
 g = 0.005 # fraction of each host's bugs replaced by environmental bugs
 tg = 1/219 # generation time, in years
 N = 10000 # number of hosts
-n_generations = int(1e4)
+n_generations = int(5e3)
 
-sim(s, T, f, g, tg, N, n_generations)
+print('s', 'T', 'host', 'env', sep='\t')
+for s in [0.04, 0.03, 0.02, 0.01, 0.005]:
+    for T in np.arange(0, 2.01, 0.2):
+        host, env = Levin(s, T, f, g, tg, N, n_generations).run()
+        print(s, T, host, env, sep='\t')
+        sys.stdout.flush()
