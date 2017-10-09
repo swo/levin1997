@@ -7,12 +7,10 @@ import numpy as np
 import sys
 
 class Levin:
-    def __init__(self, s, T, f_zero, f, g, tg, N, n_generations, H0=1e-9, E0=1e-9, log=None, log_interval=100):
-        assert f_zero > 0.0 # don't allow zero consumers; it messes up the math
-
+    def __init__(self, s, fc, cac, f, g, tg, N, n_generations, H0=1e-9, E0=1e-9, log=None, log_interval=100):
         self.s = s # selection coefficient favoring susceptible strains
-        self.T = T # average treatments per year among everyone
-        self.f_zero = f_zero # fraction of hosts who don't get treated
+        self.fc = fc # fraction consumers
+        self.cac = cac # average treatments per year among consumers
         self.f = f # fraction of environment replaced by host-shed bugs
         self.g = g # fraction of each host's bugs replaced by environmental bugs
         self.tg = tg # generation time, in years
@@ -23,10 +21,11 @@ class Levin:
         self.log = log
         self.log_interval = log_interval
 
-        self.n_zero = int(self.f_zero * self.N) # number of hosts getting no treatment
-        self.n_consumer = self.N - self.n_zero
-        self.f_consumer = self.n_consumer / self.N
-        self.p_treatment = self.T * self.tg / self.f_consumer
+        self.n_consumer = int(self.fc * self.N)
+        self.n_zero = self.N - self.n_consumer
+        self.p_treatment = self.cac * self.tg
+
+        assert 0 <= self.p_treatment <= 1
 
     def run(self):
         if self.log is not None:
@@ -61,22 +60,21 @@ class Levin:
         self.E = self.E + self.f * (np.mean(self.H) - self.E) - self.s * self.E * (1 - self.E) / (1.0 - self.s * self.E)
 
 
-s = 0.005 # selection coefficient favoring susceptible strains
-T = 2.0 # average treatments per year
 f = 0.05 # fraction of environment replaced by host-shed bugs
 g = 0.005 # fraction of each host's bugs replaced by environmental bugs
 tg = 1/219 # generation time, in years
 N = 10000 # number of hosts
 n_generations = int(5e3)
 
-ss = [0.04, 0.03, 0.02, 0.01, 0.005]
-Ts = np.linspace(0.0, 2.0, 5)
-f_zeros = np.linspace(0.0, 0.95, num=5)
+#ss = [0.04, 0.03, 0.02, 0.01, 0.005]
+ss = [0.04, 0.02, 0.005]
+cacs = np.linspace(0.0, 2.0, 5)
+fnzs = np.linspace(0.0, 1.0, num=5)
 
-print('s', 'T', 'f_zero', 'host', 'env', sep='\t')
+print('s', 'fnz', 'cac', 'host', 'env', sep='\t')
 for s in ss:
-    for T in Ts:
-        for f_zero in f_zeros:
-            host, env = Levin(s, T, f_zero, f, g, tg, N, n_generations).run()
-            print(s, T, f_zero, host, env, sep='\t')
+    for cac in cacs:
+        for fnz in fnzs:
+            host, env = Levin(s, fnz, cac, f, g, tg, N, n_generations).run()
+            print(s, fnz, cac, host, env, sep='\t')
             sys.stdout.flush()
