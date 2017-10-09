@@ -53,15 +53,10 @@ is higher, and similarly the dependence of resistance on $T$ is higher when
 $f_c$ is higher. This is no surprise: the average consumption over all consumers
 is $f_c T$.
 
-Third, I show that the consumption/resistance curve becomes sigmoidal when the
-fitness costs of antibiotic treatment for the susceptible strain is smaller. In
-other words, increasing consumption among consumers gives you increasing gains
-in resistance when multiple treatments are needed to push a host to full
-resistance. When just one dose will push a host to full resistance, a second
-dose has no effect, which leads to the concave-down part of the curve. This
-concavity is only observable when the fitness cost of resistance is small.
-Otherwise, the resistant strain dies out too quickly for the successive
-treatments to build on one another.
+Third, resistance stays near zero for nonzero $T$ and $f_c$ when the fitness
+cost $s_S$ of antibiotic treatment on susceptible strains is below $1$. I
+expected to get some sigmoidal relationship, but instead it looks like it just
+pushes the resistance to zero.
 
 # Addendum: Technical errata
 
