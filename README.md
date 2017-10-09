@@ -58,6 +58,14 @@ cost $s_S$ of antibiotic treatment on susceptible strains is below $1$. I
 expected to get some sigmoidal relationship, but instead it looks like it just
 pushes the resistance to zero.
 
+Finally, the regression coefficient $\beta_f$ and $\beta_m$ that I got from the
+real data are consistent with the observed $f$ and $m$. $\beta_f$ easily takes
+on a wide range of values, including up to the approximate unity observed in
+the data. $\beta_m$ tends to be smaller, and it gets up to $0.5$ only for very
+weak fitness costs ($s_R = 0.001$). This confirms my general notion: the
+fitness costs has to be very weak to observe a trend in $\beta_m$, which is why
+we only see it for quinolones.
+
 # Addendum: Technical errata
 
 I think there is an error in the equations on page S10 in the original manuscript. There it says that:

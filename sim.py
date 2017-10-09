@@ -82,10 +82,10 @@ tg = 1/219 # generation time, in years
 N = 10000 # number of hosts
 n_generations = int(5e3)
 
-sSs = np.linspace(0.8, 1.0, num=3)
-sRs = [0.0, 0.04, 0.02, 0.005]
+sSs = [0.8, 0.9, 1.0]
+sRs = [0.04, 0.02, 0.005, 0.001]
 cacs = [0.0, 0.5, 1.0, 1.5, 2.0]
-fnzs = [0.25, 0.5, 0.75, 1.0]
+fnzs = [0.0, 0.25, 0.5, 0.75, 1.0]
 
 print('sS', 'sR', 'fnz', 'cac', 'host', 'env', sep='\t')
 for sS in sSs:
