@@ -62,9 +62,18 @@ Finally, the regression coefficient $\beta_f$ and $\beta_m$ that I got from the
 real data are consistent with the observed $f$ and $m$. $\beta_f$ easily takes
 on a wide range of values, including up to the approximate unity observed in
 the data. $\beta_m$ tends to be smaller, and it gets up to $0.5$ only for very
-weak fitness costs ($s_R = 0.001$). This confirms my general notion: the
-fitness costs has to be very weak to observe a trend in $\beta_m$, which is why
-we only see it for quinolones.
+weak fitness costs ($s_R = 0.001$).
+
+In general, the regression coefficients are higher for small $s_R$ but the
+$p$-values are more advantageous for $f$ and $m$. This makes it unclear what I
+expect: I read that quinolones have a low fitness cost, which would make me
+think that they would have a long decay time, but the Kuster *et al.* data
+makes it look like quinolone resistance decays quickly (order of 10 days) and
+macrolide resistance decays slowly (order of 100 days). Thus, it's not clear to
+me whether we're seeing the good $p$-values (i.e., high $s_R$) or high slopes
+(i.e., low $s_R$). But this at least does point to the fact that we think it is
+easier to find relationships with $f$ and that we expect those relationships to
+be larger.
 
 # Addendum: Technical errata
 
